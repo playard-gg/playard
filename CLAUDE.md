@@ -131,5 +131,10 @@ No signup means no auth layer between a request and the API, so:
 
 ## Commands
 
-_(fill in once the projects are scaffolded, e.g. `go run ./server/cmd/...`,
-`npm run dev` in `web/`, lint/format commands)_
+- `make dev-server` — run the Go server alone (`go run ./cmd/server`)
+- `make dev-web` — run the Vite dev server alone
+- `make dev` — run both concurrently for local development
+- `make build` — build the Go binary (`server/bin/server`) and the
+  frontend production bundle (`web/dist`)
+- `make run` — build, then serve both together (server + `vite preview`)
+- `make clean` — remove build artifacts

@@ -37,7 +37,8 @@ playard/
 │   │   └── lib/
 │   └── package.json
 ├── DESIGN_SYSTEM.md
-└── project_plan/
+├── project_plan/
+└── tasks/           # local task tracking, gitignored (see Task Tracking)
 ```
 
 ## Game Architecture — Plug-and-Play
@@ -138,3 +139,10 @@ No signup means no auth layer between a request and the API, so:
   frontend production bundle (`web/dist`)
 - `make run` — build, then serve both together (server + `vite preview`)
 - `make clean` — remove build artifacts
+
+## Task Tracking
+
+`tasks/` is a local, gitignored scratch space — never committed. For
+complex tasks (multi-step features, non-trivial refactors), track the
+work as a markdown file there from requirement → plan → implementation
+notes. Skip it for small, one-shot changes.

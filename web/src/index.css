@@ -1,1 +1,64 @@
 @import "tailwindcss";
+
+@theme {
+  --color-page: #0b0a14;
+  --color-card: #15141f;
+  --color-surface: #1e1d2b;
+  --color-border: #2a2938;
+
+  --color-text-primary: #ffffff;
+  --color-text-muted: #9793a8;
+
+  --color-accent-yellow: #f5c945;
+  --color-accent-yellow-muted: #3d3626;
+  --color-accent-cyan: #4fc8f5;
+  --color-accent-cyan-muted: #1f3a52;
+  --color-accent-pink: #ec4c9c;
+  --color-accent-pink-muted: #3a1f35;
+
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --animate-drift: drift 7s ease-in-out infinite;
+  --animate-drift-slow: drift-slow 8s ease-in-out infinite;
+  --animate-twinkle: twinkle 2.4s ease-in-out infinite;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-text-primary);
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(6deg);
+  }
+}
+
+@keyframes drift-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(14px) rotate(-5deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.4);
+  }
+}

@@ -1,0 +1,21 @@
+.login-page .bg-glow {
+  background:
+    radial-gradient(600px circle at 12% 15%, color-mix(in srgb, var(--color-accent-yellow) 20%, transparent), transparent 60%),
+    radial-gradient(650px circle at 88% 20%, color-mix(in srgb, var(--color-accent-cyan) 20%, transparent), transparent 60%),
+    radial-gradient(700px circle at 50% 95%, color-mix(in srgb, var(--color-accent-pink) 18%, transparent), transparent 60%),
+    var(--color-page);
+}
+
+.login-page .bg-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, white 3.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, white 3.5%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at 50% 40%, black 10%, transparent 75%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page [class*='animate-'] {
+    animation: none !important;
+  }
+}

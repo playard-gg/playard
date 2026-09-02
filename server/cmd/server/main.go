@@ -8,6 +8,21 @@ import (
 
 	"github.com/kaviraj-j/playard/server/internal/auth"
 	"github.com/kaviraj-j/playard/server/internal/config"
+	"github.com/kaviraj-j/playard/server/internal/games"
+	"github.com/kaviraj-j/playard/server/internal/games/catalog"
+	"github.com/kaviraj-j/playard/server/internal/httpapi"
+	"github.com/kaviraj-j/playard/server/internal/ratelimit"
+	"github.com/kaviraj-j/playard/server/internal/room"
+	"github.com/kaviraj-j/playard/server/internal/ws"
+)
+
+const (
+	// roomRate/roomBurst let a player create or join freely in normal use
+	// while capping code-guessing to a few attempts per second per IP.
+	roomRate  = 1.0
+	roomBurst = 10.0
+
+	bucketIdle = 10 * time.Minute
 )
 
 type healthResponse struct {
@@ -20,10 +35,27 @@ func main() {
 	startedAt := time.Now()
 	cfg := config.Load()
 
+	registry, err := games.NewRegistry(catalog.All()...)
+	if err != nil {
+		log.Fatalf("game catalog is invalid: %v", err)
+	}
+
 	authService := auth.NewService(cfg.AuthSecret)
+	rooms := room.NewManager(registry, room.DefaultGrace)
+	hubs := ws.NewRegistry()
+	// The reaper frees seats and rooms in the background; hubs rebroadcast so
+	// remaining players see someone leave without waiting for another event.
+	rooms.OnChange(hubs.Broadcast)
+
+	limiter := ratelimit.New(roomRate, roomBurst)
+
+	done := make(chan struct{})
+	defer close(done)
+	rooms.StartReaper(done)
+	limiter.StartCleanup(done, bucketIdle)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		resp := healthResponse{
 			Status:    "ok",
 			UptimeSec: int64(time.Since(startedAt).Seconds()),
@@ -33,7 +65,9 @@ func main() {
 		json.NewEncoder(w).Encode(resp)
 	})
 
-	mux.HandleFunc("/api/auth/login", authService.LoginHandler)
+	mux.HandleFunc("POST /api/auth/login", authService.LoginHandler)
+	httpapi.New(registry, rooms).Routes(mux, authService, limiter.Middleware)
+	mux.Handle("GET /api/ws", ws.NewHandler(authService, rooms, hubs, cfg.CORSOrigin))
 
 	log.Printf("playard server listening on %s", cfg.Addr)
 	if err := http.ListenAndServe(cfg.Addr, withCORS(mux, cfg.CORSOrigin)); err != nil {
